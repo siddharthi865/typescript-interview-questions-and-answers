@@ -116,9 +116,15 @@ So at runtime, there is no TypeScript, only JavaScript.
 
     TypeScript is a superset of JavaScript, so every valid JavaScript code is also valid TypeScript.
 
+<i>**JavaScript gives flexibility, but TypeScript adds safety and scalability. TypeScript helpscatch bugs early, improves maintainability, and makes large codebases easier tomanage without changing JavaScript’s runtime behavior.**</i>
+
 ## Question 2. What are the advantages of using TypeScript?
 
+<i>**TypeScript improves code quality, developer productivity, and scalability by adding static typing and powerful tooling to JavaScript—without changing runtime behavior.**</i>
+
 ## Question 3. How do you install TypeScript?
+
+<i>**In real-world projects, I prefer installing TypeScript locally as a dev dependency and using npx tsc, which ensures consistent compiler versions across environments.**<i>
 
 ## Question 4. How do you compile TypeScript code to JavaScript?
 
