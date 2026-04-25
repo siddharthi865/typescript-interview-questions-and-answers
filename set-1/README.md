@@ -124,7 +124,7 @@ So at runtime, there is no TypeScript, only JavaScript.
 
 ## Question 3. How do you install TypeScript?
 
-<i>**In real-world projects, I prefer installing TypeScript locally as a dev dependency and using npx tsc, which ensures consistent compiler versions across environments.**<i>
+<i>**In real-world projects, I prefer installing TypeScript locally as a dev dependency and using npx tsc, which ensures consistent compiler versions across environments.**</i>
 
 ## Question 4. How do you compile TypeScript code to JavaScript?
 
@@ -159,3 +159,33 @@ So at runtime, there is no TypeScript, only JavaScript.
 ## Question 19. What is type aliasing? Give an example.
 
 ## Question 20. What are interfaces in TypeScript? Give an example.
+
+An interface is a custom type definition used to describe the structure of objects, classes or functions.
+
+It’s like a contract — any object or class that implements the interface must satisfy its structure.
+
+1. **Basic Interface Example**
+
+   ```ts
+   interface User {
+     id: number;
+     name: string;
+     isActive: boolean;
+   }
+
+   const user1: User = {
+     id: 1,
+     name: "Alice",
+     isActive: true,
+   };
+   ```
+
+   Here, <code>User</code> defines the shape of a user object.
+
+2. **Optional Properties**
+
+3. **Readonly Properties**
+
+4. **Methods in Interfaces**
+
+5. **Extending Interfaces**
