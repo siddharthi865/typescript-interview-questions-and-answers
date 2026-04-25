@@ -158,6 +158,66 @@ So at runtime, there is no TypeScript, only JavaScript.
 
 ## Question 19. What is type aliasing? Give an example.
 
+A type alias allows you to create a new name for any type, including:
+
+- Primitive types
+- Union types
+- Objects
+- Tuples
+- Function types
+
+**Simple Type Alias Syntax:**
+
+<code>type AliasName = Type;</code>
+
+1. **Simple Type Alias**
+
+   ```ts
+   type ID = number | string;
+
+   let userId: ID;
+
+   userId = 101; //valid
+   userId = "102"; //valid
+   userId = true; //error
+   ```
+
+   <i>Here, <code>ID</code> is a type alias for <code>number | string</code>.</i>
+
+2. **Type Alias for Object**
+
+   ```ts
+   type User = { id: number; name: string; isActive: boolean };
+
+   const user: User = { id: 1, name: "Alice", isActive: true };
+   ```
+
+   <i>Makes object types **reusable and readable**.</i>
+
+3. **Type Alias for Function**
+
+   ```ts
+   type MathOperation = (a: number, b: number) => number;
+
+   const add: MathOperation = (x, y) => x + y;
+   const multiply: MathOperation = (x, y) => x * y;
+   ```
+
+   <i>Reusable function signatures for callbacks or higher-order functions.</i>
+
+4. **Type Alias with Union & Literal Types**
+
+   ```ts
+   type Status = "success" | "error" | "loading";
+
+   function printStatus(status: Status) {
+     console.log(`Status: ${status}`);
+   }
+
+   printStatus("success"); //✅
+   printStatus("done"); //❌ Error
+   ```
+
 ## Question 20. What are interfaces in TypeScript? Give an example.
 
 An interface is a custom type definition used to describe the structure of objects, classes or functions.
