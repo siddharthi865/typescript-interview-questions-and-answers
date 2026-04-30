@@ -1,41 +1,41 @@
-# Set 1
+# Set 5
 
-## Question 1.
+## Question 1. How do recursive types work? Give an example
 
-## Question 2.
+## Question 2. What are branded types in TypeScript?
 
-## Question 3.
+## Question 3. How do you implement nominal typing in TypeScript?
 
-## Question 4.
+## Question 4. Explain advanced keyof and indexed access types
 
-## Question 5.
+## Question 5. How do you implement type-safe event emitters?
 
-## Question 6.
+## Question 6. Explain variance (covariance and contravariance) in TypeScript
 
-## Question 7.
+## Question 7. How does TypeScript handle type widening?
 
-## Question 8.
+## Question 8. How does TypeScript handle type inference with generics?
 
-## Question 9.
+## Question 9. How do you create strongly-typed Redux actions in TypeScript?
 
-## Question 10.
+## Question 10. How do you handle discriminated unions in complex APIs?
 
-## Question 11.
+## Question 11. How do you implement conditional props in React + TypeScript?
 
-## Question 12.
+## Question 12. How does never help with exhaustive checks in TypeScript?
 
-## Question 13.
+## Question 13. How do you implement singleton patterns with TypeScript classes?
 
-## Question 14.
+## Question 14. How do you extend third-party module types?
 
-## Question 15.
+## Question 15. How do you define a type-safe builder pattern in TypeScript?
 
-## Question 16.
+## Question 16. How do you define polymorphic components in React + TypeScript?
 
-## Question 17.
+## Question 17. How do you handle advanced keyof + mapped types for API responses?
 
-## Question 18.
+## Question 18. How do you implement recursive generic types?
 
-## Question 19.
+## Question 19. How do you define deeply nested immutable types?
 
-## Question 20.
+## Question 20. Explain best practices for maintaining a large TypeScript codebase
