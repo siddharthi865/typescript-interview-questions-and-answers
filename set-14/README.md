@@ -25,6 +25,77 @@
 
 ## Question 1. How do you define readonly tuple elements?
 
+## Short answer
+
+You define readonly tuple elements using the `readonly` modifier before the tuple type or with `as const` for literal inference.
+
+---
+
+## Explanation
+
+In TypeScript, tuples are fixed-length arrays with known element types. By default, tuple elements are mutable—you can reassign values. To enforce immutability, you use `readonly` tuples, which prevent any modification of elements, length, or structure.
+
+There are two primary approaches:
+
+### 1. Explicit `readonly` tuple type
+
+You prefix the tuple type with `readonly`, which makes all elements immutable.
+
+```ts
+type Point = readonly [number, number];
+```
+
+This means:
+
+- You cannot change `point[0]` or `point[1]`
+- You cannot use mutating methods like `push`, `pop`, `splice`
+
+### 2. `as const` assertion (literal-level immutability)
+
+When defining values, `as const` infers the most specific literal type and makes the structure deeply readonly.
+
+```ts
+const point = [10, 20] as const;
+// type is readonly [10, 20]
+```
+
+This is more powerful because:
+
+- It preserves literal types (`10` instead of `number`)
+- It enforces deep immutability
+
+---
+
+## Example
+
+```ts
+// Explicit readonly tuple type
+type RGB = readonly [number, number, number];
+
+const color: RGB = [255, 128, 64];
+
+// color[0] = 0; ❌ Error: cannot assign to readonly element
+// color.push(100); ❌ Error: property 'push' does not exist
+
+// Using const assertion
+const position = [100, 200] as const;
+
+// position[0] = 0; ❌ Error
+// position.push(300); ❌ Error
+
+// Preserves literal types
+type X = (typeof position)[0]; // 100 (not number)
+```
+
+---
+
+## Pitfalls
+
+- `readonly` only applies shallowly unless using `as const`; nested objects inside tuples may still be mutable.
+- `as const` can overly narrow types (literal types) making generics harder to work with.
+- Array methods that mutate (e.g., `push`, `splice`) become unavailable, which can break legacy code.
+- Confusing `readonly T[]` vs `readonly [T, T]`: one is a readonly array, the other is a fixed-length tuple.
+
 ## Question 2. How do you type a function returning a union of tuples?
 
 ## Question 3. How do you define type-safe default props in React components?
