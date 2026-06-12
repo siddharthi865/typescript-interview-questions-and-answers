@@ -25,6 +25,98 @@
 
 ## Question 1. How do you implement polymorphic React components?
 
+## Short answer
+
+Polymorphic React components let you change the underlying rendered element (or component) via an `as` prop while preserving correct TypeScript inference for props and refs.
+
+---
+
+## Explanation
+
+Polymorphic components are a TypeScript pattern used in design systems (e.g., `Box`, `Text`, `Button`) where a single component can render as different HTML tags or custom components.
+
+For example:
+
+- `<Box as="div" />`
+- `<Box as="a" href="..." />`
+- `<Box as={CustomComponent} customProp />`
+
+The main challenge is **preserving type safety**:
+
+- Props must change based on `as`
+- Invalid props must be rejected (e.g., `href` on `div` unless `as="a"`)
+- Ref typing must match the rendered element
+
+This is typically solved using:
+
+- Generic type parameter `T extends React.ElementType`
+- `React.ComponentPropsWithoutRef<T>`
+- Optional `as` prop
+- Utility type merging pattern
+
+Trade-offs:
+
+- Increased type complexity
+- Harder to debug inference issues
+- Excellent API flexibility for design systems
+
+---
+
+## Example
+
+```tsx
+import React from "react";
+
+type PolymorphicProps<T extends React.ElementType> = {
+  as?: T;
+};
+
+type Props<T extends React.ElementType> = PolymorphicProps<T> &
+  Omit<React.ComponentPropsWithoutRef<T>, keyof PolymorphicProps<T>>;
+
+function Box<T extends React.ElementType = "div">(props: Props<T>) {
+  const { as, ...rest } = props;
+
+  const Component = as ?? "div";
+
+  return <Component {...rest} />;
+}
+
+// Usage examples:
+
+export default function App() {
+  return (
+    <>
+      <Box>Default div</Box>
+
+      <Box as="a" href="https://example.com">
+        Link box
+      </Box>
+
+      <Box as="button" onClick={() => console.log("clicked")}>
+        Button box
+      </Box>
+    </>
+  );
+}
+```
+
+---
+
+## Pitfalls
+
+- **Type explosion / slow inference**
+  - Large polymorphic utilities can slow TS in large codebases.
+
+- **Ref typing complexity**
+  - Adding `forwardRef` requires additional generic constraints and can break inference if not carefully typed.
+
+- **Prop conflicts**
+  - `Omit<..., keyof PolymorphicProps>` is essential; otherwise `as` conflicts with native props.
+
+- **Runtime mismatch risk**
+  - TypeScript won't prevent invalid runtime components if `as` is dynamic or loosely typed.
+
 ## Question 2. How do you type React props with conditional logic?
 
 ## Question 3. How do you implement type-safe plugin systems?
