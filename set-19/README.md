@@ -25,6 +25,121 @@
 
 ## Question 1. How do you type a rest parameter function with generics?
 
+## Short answer
+
+You type a rest-parameter function with generics by declaring the generic parameter(s) on the function and typing the rest parameter as a generic tuple or array type (often using variadic tuple types for precise inference).
+
+---
+
+## Explanation
+
+In TypeScript, rest parameters (`...args`) can be typed as either a generic array (`T[]`) or, more powerfully, a **variadic tuple type** (`T extends any[]`) when you want to preserve exact argument shapes.
+
+There are two common levels of sophistication:
+
+### 1. Simple generic rest parameter (homogeneous)
+
+Use this when all arguments share the same type:
+
+```ts
+function collect<T>(...items: T[]): T[] {
+  return items;
+}
+```
+
+- `T` is inferred from all arguments
+- Loss: you don’t preserve positional types
+
+---
+
+### 2. Variadic tuple generics (recommended for real-world APIs)
+
+Use this when you want to preserve argument structure and types precisely:
+
+```ts
+function callWithLogging<T extends unknown[], R>(
+  fn: (...args: T) => R,
+  ...args: T
+): R {
+  console.log("Calling with:", args);
+  return fn(...args);
+}
+```
+
+Here:
+
+- `T` captures the entire argument tuple
+- `...args: T` ensures exact preservation of types and order
+- `R` represents return type
+
+This pattern is foundational for utility types like `Parameters<T>` and `ConstructorParameters<T>`.
+
+---
+
+### Why this matters
+
+Without tuple inference, you lose:
+
+- argument position safety
+- literal type preservation
+- overload fidelity
+
+With variadic tuples, TypeScript can infer:
+
+```ts
+callWithLogging((a: number, b: string) => a + b.length, 10, "hello");
+```
+
+`T = [number, string]` — fully preserved.
+
+---
+
+## Example
+
+```ts
+function debounce<T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number,
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// Usage
+const log = (msg: string, count: number) => {
+  console.log(msg, count);
+};
+
+const debouncedLog = debounce(log, 300);
+
+debouncedLog("hello", 42);
+```
+
+Key idea: `Parameters<T>` extracts a tuple of arguments and reuses it in the rest parameter.
+
+---
+
+## Pitfalls
+
+- **Overusing `any[]` loses inference quality**
+  - You lose tuple precision and autocomplete benefits
+
+- **Not constraining generics properly**
+  - `T extends any[]` or `T extends unknown[]` is required for tuple capture
+
+- **Rest parameter widening**
+  - `...args: T[]` is wrong when `T` is already an array type (double array issue)
+
+- **Inference collapse in complex higher-order functions**
+  - Deep generic compositions may degrade to `unknown[]`
+
+- **Compatibility**
+  - Variadic tuple improvements are best in TS 4.0+; older versions had weaker inference
+
 ## Question 2. How do you type a reducer function in React with discriminated unions?
 
 ## Question 3. How do you type `useState` in React with generics?
