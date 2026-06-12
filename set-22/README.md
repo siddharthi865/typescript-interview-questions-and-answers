@@ -25,6 +25,78 @@
 
 ## Question 1. How do you use `as const` to prevent type widening?
 
+## Short answer
+
+`as const` tells TypeScript to infer the most specific, immutable literal types instead of widening them to broader types like `string` or `number`.
+
+---
+
+## Explanation
+
+By default, TypeScript _widens_ values to more general types for flexibility. For example, `"admin"` becomes `string`, and `[1, 2]` becomes `number[]`.
+
+`as const` prevents this widening by:
+
+- Making object properties `readonly`
+- Inferring literal types instead of widened primitives
+- Preserving tuple types instead of arrays
+- Freezing values at the type level (not runtime)
+
+This is especially useful for:
+
+- Discriminated unions
+- Configuration objects
+- Enum-like structures without `enum`
+- Strict API contracts
+
+Trade-off: You lose mutability and some flexibility, but gain much stronger type safety and inference precision.
+
+---
+
+## Example
+
+```ts
+const config = {
+  env: "production",
+  retries: 3,
+  features: ["auth", "billing"],
+} as const;
+
+// Types become:
+// {
+//   readonly env: "production";
+//   readonly retries: 3;
+//   readonly features: readonly ["auth", "billing"];
+// }
+
+// Usage
+type Config = typeof config;
+
+function logEnv(c: Config) {
+  console.log(c.env); // "production"
+}
+
+// config.env = "dev"; ❌ Error: readonly property
+```
+
+Tuple preservation example:
+
+```ts
+const point = [10, 20] as const;
+
+// type: readonly [10, 20]
+```
+
+---
+
+## Pitfalls
+
+- `as const` makes deeply nested structures readonly (can surprise you in large objects)
+- Arrays become `readonly tuple types`, so methods like `.push()` are disallowed
+- Overuse can make types overly rigid and harder to extend
+- Doesn’t enforce runtime immutability—only compile-time safety
+- Can complicate interop with APIs expecting mutable arrays/objects
+
 ## Question 2. How do you declare ambient variables using `declare var`?
 
 ## Question 3. How do you declare ambient types for a third-party library?
