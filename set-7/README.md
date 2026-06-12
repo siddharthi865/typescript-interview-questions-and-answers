@@ -25,6 +25,83 @@
 
 ## Question 1. How do you define a type for a callback function?
 
+## Short answer
+
+A callback function type in TypeScript is defined by specifying its parameter types and return type using a function type signature or a type alias.
+
+---
+
+## Explanation
+
+In TypeScript, a callback is just a function passed as an argument to another function. To type it properly, you explicitly define:
+
+- The **input parameters** the callback receives
+- The **return type** it produces
+
+There are three common ways to define callback types:
+
+### 1. Inline function type annotation (most common for simple cases)
+
+You directly annotate the parameter as a function type.
+
+### 2. Type alias (best for reuse and readability)
+
+You define a reusable function type using `type`.
+
+### 3. Interface (useful for object-like callable contracts, less common for simple callbacks)
+
+### Design considerations:
+
+- Prefer **type aliases** for reusable callbacks
+- Keep callback types explicit to avoid implicit `any`
+- Use generics when callbacks need to be reusable across multiple data types
+- Ensure return type clarity (especially for async callbacks returning `Promise<T>`)
+
+---
+
+## Example
+
+```ts
+// 1. Type alias for a callback
+type Callback<T> = (data: T) => void;
+
+// Function that accepts a callback
+function processUser(callback: Callback<string>) {
+  const userName = "Alice";
+  callback(userName);
+}
+
+// Usage
+processUser((name) => {
+  console.log("User:", name);
+});
+```
+
+### Async callback example
+
+```ts
+type AsyncCallback<T> = (data: T) => Promise<void>;
+
+async function fetchData(callback: AsyncCallback<number>) {
+  const result = 42;
+  await callback(result);
+}
+
+fetchData(async (value) => {
+  console.log("Received:", value);
+});
+```
+
+---
+
+## Pitfalls
+
+- Implicit `any` in callback parameters if types aren’t defined explicitly
+- Overusing inline callback types → reduces reusability
+- Forgetting to type async callbacks as `Promise<T>`
+- Using overly broad types like `Function` (loses type safety and IntelliSense)
+- Mismatch between expected and actual callback return values causing runtime bugs
+
 ## Question 2. How do you extend multiple interfaces?
 
 ## Question 3. How do you define a class implementing multiple interfaces?
