@@ -25,6 +25,67 @@
 
 ## Question 1. How do you restrict generic types using extends?
 
+## Short answer
+
+You restrict generic types using `extends` by constraining the type parameter to a specific shape, interface, or union, ensuring only compatible types can be passed.
+
+---
+
+## Explanation
+
+In TypeScript, `extends` in generics acts as a **constraint boundary**—it enforces that a generic type argument must be assignable to a specified type.
+
+This is not inheritance in the OOP sense; instead, it’s a **type compatibility filter**.
+
+### Why it matters
+
+- Ensures type safety at compile time
+- Enables safe property access inside generic functions
+- Improves API expressiveness (you can assume certain structure exists)
+- Prevents overly permissive generics like `any`
+
+### Design implications
+
+- Tight constraints improve safety but reduce flexibility
+- Loose constraints increase reuse but push checks to runtime or callers
+- Good API design balances expressiveness and strictness
+
+---
+
+## Example
+
+```ts
+type HasId = {
+  id: string;
+};
+
+function getById<T extends HasId>(items: T[], id: string): T | undefined {
+  return items.find((item) => item.id === id);
+}
+
+// Valid
+const users = [
+  { id: "1", name: "Alice" },
+  { id: "2", name: "Bob" },
+];
+
+const user = getById(users, "1");
+
+// Invalid: missing `id`
+// getById([{ name: "NoId" }], "1"); // ❌ Type error
+```
+
+Here, `T extends HasId` guarantees every `T` has an `id`, allowing safe access inside the function.
+
+---
+
+## Pitfalls
+
+- Over-constraining generics reduces reusability (forces unnecessary properties)
+- Confusing `extends` constraint with class inheritance semantics
+- Forgetting constraints leads to unsafe property access (`T` may not have required fields)
+- Using overly broad constraints like `extends object` provides little value
+
 ## Question 2. How do you implement default type parameters in generics?
 
 ## Question 3. How do you define recursive types for nested structures?
