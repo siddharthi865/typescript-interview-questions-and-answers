@@ -25,6 +25,88 @@
 
 ## Question 1. How do you type Prisma queries in TypeScript?
 
+## Short answer
+
+Prisma automatically generates fully typed TypeScript clients, so you type Prisma queries by using `PrismaClient` and the generated model types (e.g. `Prisma.UserFindManyArgs`, `Prisma.User`, etc.) from `@prisma/client`.
+
+---
+
+## Explanation
+
+Prisma’s type safety is built into its code generation step. When you run `prisma generate`, it creates a strongly typed client based on your schema (`schema.prisma`). This means:
+
+- Every model becomes a TypeScript type (e.g. `User`, `Post`)
+- Every query method (`findMany`, `findUnique`, `create`, etc.) is fully typed
+- Query inputs are validated at compile time using generated `Args` types
+- Return types are inferred based on selected fields (`select` / `include`)
+
+### Key idea
+
+You typically **do not manually type Prisma queries**—you rely on generated types:
+
+- `Prisma.UserFindManyArgs` → type of query input
+- `Prisma.UserGetPayload<T>` → inferred result type based on selection
+- `PrismaClient['user']` → typed model delegate
+
+This gives _end-to-end type safety_ from DB schema → query → result.
+
+### Trade-offs
+
+- Very strong safety + autocomplete
+- Tight coupling between schema and TS types (schema change requires regeneration)
+- Complex `select/include` can produce verbose inferred types
+
+---
+
+## Example
+
+```ts
+import { PrismaClient, Prisma } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+// Explicitly typing query args (rare, but useful for reusable query builders)
+const userQuery: Prisma.UserFindManyArgs = {
+  where: {
+    isActive: true,
+  },
+  select: {
+    id: true,
+    email: true,
+  },
+};
+
+async function getUsers() {
+  const users = await prisma.user.findMany(userQuery);
+
+  // users is inferred as:
+  // { id: string; email: string }[]
+  return users;
+}
+
+// Typing the result using Prisma helper
+type UserWithPosts = Prisma.UserGetPayload<{
+  include: { posts: true };
+}>;
+
+async function getUserWithPosts(id: string): Promise<UserWithPosts | null> {
+  return prisma.user.findUnique({
+    where: { id },
+    include: { posts: true },
+  });
+}
+```
+
+---
+
+## Pitfalls
+
+- Overusing explicit `Prisma.*Args` types can make code verbose and harder to refactor.
+- Forgetting to run `prisma generate` after schema changes causes type mismatches.
+- Deep `include` trees can produce large inferred types that slow TypeScript compilation.
+- Mixing `select` and `include` incorrectly can lead to unexpected payload shapes.
+- Treating Prisma types as domain models can tightly couple DB schema to business logic.
+
 ## Question 2. How do you define polymorphic classes with multiple generic parameters?
 
 ## Question 3. How do you implement exhaustive type checking with `never` in union types?
