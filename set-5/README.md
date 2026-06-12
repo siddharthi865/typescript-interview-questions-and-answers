@@ -25,6 +25,108 @@
 
 ## Question 1. How do recursive types work? Give an example
 
+## Short answer
+
+Recursive types in TypeScript are types that reference themselves, directly or indirectly, to model nested or infinitely deep structures like trees or JSON-like data.
+
+---
+
+## Explanation
+
+Recursive types allow you to define structures where a type contains itself as part of its definition. This is essential for modeling hierarchical or self-similar data such as:
+
+- File systems (folders containing folders)
+- JSON objects (objects containing nested objects/arrays)
+- Linked lists and trees (nodes pointing to other nodes)
+
+TypeScript supports recursion naturally in type aliases and interfaces, but it relies on **lazy evaluation of types** rather than runtime recursion.
+
+### Key idea
+
+A recursive type typically has a **base case** (non-recursive value) and a **recursive case** (self-reference).
+
+For example:
+
+- Base case: `string`
+- Recursive case: `object containing the same type again`
+
+Without a base case, the type would be infinitely expanding and unusable.
+
+### Important behavior
+
+TypeScript does **not expand recursive types infinitely at compile time**. Instead, it:
+
+- Lazily evaluates them
+- Stops expansion when a reasonable depth is reached (for tooling/diagnostics)
+
+This makes recursive types practical for real-world deep structures.
+
+---
+
+## Example
+
+### Recursive JSON-like type
+
+```ts
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]
+  | { [key: string]: JSONValue };
+
+const validJson: JSONValue = {
+  name: "Alice",
+  age: 30,
+  tags: ["dev", "ts"],
+  address: {
+    city: "Delhi",
+    coords: {
+      lat: 28.61,
+      lng: 77.2,
+    },
+  },
+};
+```
+
+### Recursive tree structure
+
+```ts
+type TreeNode<T> = {
+  value: T;
+  children: TreeNode<T>[];
+};
+
+const tree: TreeNode<string> = {
+  value: "root",
+  children: [
+    {
+      value: "child-1",
+      children: [],
+    },
+    {
+      value: "child-2",
+      children: [
+        {
+          value: "grandchild",
+          children: [],
+        },
+      ],
+    },
+  ],
+};
+```
+
+---
+
+## Pitfalls
+
+- **Infinite recursion without a base case** can lead to unusable or overly complex types.
+- Deep recursion can cause **TypeScript performance issues** in large codebases (slow type-checking).
+- Recursive types can become **hard to read and maintain**, especially when combined with generics and unions.
+- Excessive nesting may trigger TypeScript’s recursion depth limits, resulting in errors like “type instantiation is excessively deep.”
+
 ## Question 2. What are branded types in TypeScript?
 
 ## Question 3. How do you implement nominal typing in TypeScript?
