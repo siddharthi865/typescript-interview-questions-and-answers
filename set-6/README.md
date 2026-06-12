@@ -25,6 +25,97 @@
 
 ## Question 1. How do you enable strict null checks in TypeScript?
 
+## Short answer
+
+Enable strict null checks by setting `"strictNullChecks": true` in `tsconfig.json`, or more commonly, by enabling `"strict": true`, which includes it automatically.
+
+---
+
+## Explanation
+
+TypeScript’s null safety system is opt-in. Without `strictNullChecks`, `null` and `undefined` are assignable to all types, which defeats much of the type safety.
+
+When `strictNullChecks` is enabled:
+
+- `null` and `undefined` become distinct types.
+- You must explicitly allow them via unions (e.g., `string | null`).
+- The compiler forces you to handle potentially missing values via narrowing, guards, or optional chaining.
+
+In modern TypeScript (recommended), teams typically enable `"strict": true` because it bundles multiple safety checks:
+
+- `strictNullChecks`
+- `noImplicitAny`
+- `strictFunctionTypes`
+- `strictBindCallApply`
+- `strictPropertyInitialization`
+- `useUnknownInCatchVariables`
+
+This leads to safer code and fewer runtime `Cannot read property of undefined` errors.
+
+Trade-off:
+
+- More upfront type work (handling `undefined` explicitly)
+- Significantly fewer runtime bugs in large codebases
+
+---
+
+## Example
+
+### tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "strict": true
+  }
+}
+```
+
+Or explicitly:
+
+```json
+{
+  "compilerOptions": {
+    "strictNullChecks": true
+  }
+}
+```
+
+---
+
+### TypeScript example (strict mode)
+
+```ts
+type User = {
+  name: string;
+  email?: string; // optional = string | undefined
+};
+
+function getEmail(user: User): string {
+  // ❌ Error in strict mode: Object is possibly 'undefined'
+  // return user.email.toLowerCase();
+
+  // ✅ Safe narrowing
+  if (!user.email) {
+    return "no-email@example.com";
+  }
+
+  return user.email.toLowerCase();
+}
+
+const u: User = { name: "Alice" };
+console.log(getEmail(u));
+```
+
+---
+
+## Pitfalls
+
+- Assuming `undefined` is still “ignored” leads to compilation errors after enabling strict mode.
+- Overusing non-null assertions (`!`) can reintroduce runtime crashes.
+- Legacy codebases may require incremental adoption (`strictNullChecks` first, then full `strict`).
+- External JS libraries may need type fixes or `undefined` handling wrappers.
+
 ## Question 2. What is the difference between null and undefined in TypeScript?
 
 ## Question 3. How do you define an optional property in an interface?
