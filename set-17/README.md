@@ -25,6 +25,73 @@
 
 ## Question 1. How do you extend an interface in TypeScript?
 
+## Short answer
+
+You extend an interface in TypeScript using the `extends` keyword, allowing one interface to inherit properties from another and optionally add new ones.
+
+---
+
+## Explanation
+
+Interface extension in TypeScript is a structural composition mechanism that enables reuse and scalability of type definitions. When you use `extends`, the child interface merges all properties from the parent interface(s), creating a new combined shape.
+
+This is particularly useful in large codebases where domain models share common fields (e.g., `id`, `timestamps`, `auditing fields`). It promotes consistency and reduces duplication.
+
+TypeScript also supports **multiple inheritance for interfaces**, meaning an interface can extend more than one parent. This is different from classes in JavaScript, which only support single inheritance.
+
+Key design implications:
+
+- Encourages composability over duplication
+- Enables clean domain modeling
+- Works well with structural typing (TypeScript’s core type system)
+- Can be combined with declaration merging in some advanced scenarios
+
+---
+
+## Example
+
+```ts
+interface User {
+  id: string;
+  name: string;
+}
+
+interface Timestamped {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Extending a single interface
+interface Admin extends User {
+  permissions: string[];
+}
+
+// Extending multiple interfaces
+interface AdminWithAudit extends User, Timestamped {
+  permissions: string[];
+  role: "admin";
+}
+
+const admin: AdminWithAudit = {
+  id: "123",
+  name: "Alice",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  permissions: ["read", "write"],
+  role: "admin",
+};
+```
+
+---
+
+## Pitfalls
+
+- **Property conflicts**: If multiple extended interfaces define the same property with incompatible types, TypeScript will error.
+- **Overuse can lead to deep hierarchies**: Large extension chains can reduce readability and make types harder to reason about.
+- **Not the same as type intersections in all cases**: While similar to `&`, interfaces support declaration merging, which `type` aliases do not.
+- **Runtime non-existence**: Interfaces are erased at compile time, so extension has no runtime effect.
+- **Circular dependencies**: Complex interface extension chains can lead to maintainability issues in large projects.
+
 ## Question 2. How do you implement an interface in a class?
 
 ## Question 3. How do you define a class with a constructor?
