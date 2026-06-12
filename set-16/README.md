@@ -25,6 +25,83 @@
 
 ## Question 1. What is the difference between TypeScript and JavaScript in terms of type checking?
 
+## Short answer
+
+JavaScript is dynamically typed and performs type checking at runtime, whereas TypeScript is statically typed and performs type checking at compile time (before execution).
+
+---
+
+## Explanation
+
+The key difference lies in **when and how type checking happens**:
+
+### JavaScript (Dynamic Typing)
+
+- Types are associated with **values, not variables**.
+- Type checking happens **at runtime**.
+- Errors like passing a string where a number is expected only appear when the code executes.
+
+This makes JavaScript flexible but more error-prone in large systems.
+
+---
+
+### TypeScript (Static Typing)
+
+- Types are associated with **variables and expressions at development time**.
+- Type checking happens **at compile time** via the TypeScript compiler (`tsc`).
+- It prevents many classes of bugs before code runs.
+
+TypeScript is essentially a **superset of JavaScript** that adds a static type system and compiles down to plain JavaScript.
+
+---
+
+### Key implication for engineering design
+
+- JavaScript prioritizes **flexibility and runtime dynamism**.
+- TypeScript prioritizes **predictability, maintainability, and scalability**.
+- In large codebases, TypeScript shifts error detection earlier in the development lifecycle, reducing production risk.
+
+---
+
+## Example
+
+### JavaScript (runtime error)
+
+```js
+function add(a, b) {
+  return a + b;
+}
+
+console.log(add(5, "10"));
+// Output: "510" (unexpected string concatenation)
+```
+
+No error is thrown until runtime, and behavior may be unintended.
+
+---
+
+### TypeScript (compile-time safety)
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+console.log(add(5, "10"));
+// ❌ Error: Argument of type 'string' is not assignable to parameter of type 'number'
+```
+
+The error is caught **before execution**, during compilation.
+
+---
+
+## Pitfalls
+
+- TypeScript types are **erased at runtime**, so runtime validation still requires additional tools (e.g., Zod, io-ts).
+- Over-reliance on `any` can effectively downgrade TypeScript back to JavaScript.
+- JS flexibility (dynamic properties, monkey patching) can conflict with strict typing assumptions.
+- Misconfigured `tsconfig` (e.g., disabled `strict`) reduces TypeScript’s safety guarantees.
+
 ## Question 2. How do you configure TypeScript to target different ECMAScript versions?
 
 ## Question 3. How do you enable source maps in TypeScript?
