@@ -25,6 +25,109 @@
 
 ## Question 1. How do mapped types work? Give an example
 
+Got it — I understand the interview format and I’m ready.
+
+---
+
+## Short answer
+
+Mapped types let you create new types by transforming each property of an existing type using key iteration syntax like `[K in keyof T]`.
+
+---
+
+## Explanation
+
+Mapped types are a powerful TypeScript feature that enables **type-level transformations over object keys**. Instead of manually redefining types, you iterate over the keys of an existing type (`keyof T`) and generate a new type based on a transformation rule.
+
+### Core idea
+
+```ts
+[K in keyof T]: ...
+```
+
+This means:
+
+- Take each property key `K` from type `T`
+- Produce a new property in the resulting type
+- Optionally transform:
+  - key (`as` clause)
+  - value type
+  - modifiers (`readonly`, optional `?`, etc.)
+
+### Why it matters (senior perspective)
+
+Mapped types enable:
+
+- DRY type design (avoid duplication)
+- Strong consistency across DTOs, API layers, and state models
+- Framework-level abstractions (e.g., React props, ORM projections)
+- Type-safe transformations similar to functional programming at type level
+
+They are foundational to many built-in utility types like:
+
+- `Partial<T>`
+- `Readonly<T>`
+- `Record<K, V>`
+- `Pick<T, K>`
+
+---
+
+## Example
+
+### Basic mapped type
+
+```ts
+type User = {
+  id: number;
+  name: string;
+  isActive: boolean;
+};
+
+// Make all properties optional
+type PartialUser = {
+  [K in keyof User]?: User[K];
+};
+
+const user1: PartialUser = {
+  name: "Alice",
+};
+```
+
+---
+
+### Advanced mapped type (key + value transformation)
+
+```ts
+type ApiModel<T> = {
+  [K in keyof T as `api_${string & K}`]: T[K];
+};
+
+type User = {
+  id: number;
+  name: string;
+};
+
+type ApiUser = ApiModel<User>;
+
+/*
+Equivalent to:
+{
+  api_id: number;
+  api_name: string;
+}
+*/
+```
+
+---
+
+## Pitfalls
+
+- Overusing mapped types can reduce readability and make debugging harder
+- Complex key remapping (`as`) can break IDE autocomplete clarity
+- Circular or deeply nested transformations can hurt compile performance
+- Incorrect use of `keyof any` can widen types unexpectedly (losing safety)
+- Mapped types don’t change runtime behavior — only compile-time safety
+
 ## Question 2. What is the difference between `Partial<T>` and `Required<T>` ?
 
 ## Question 3. Explain `Readonly<T>` and `Pick<T>` with examples
