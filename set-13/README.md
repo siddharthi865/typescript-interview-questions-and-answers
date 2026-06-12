@@ -25,6 +25,92 @@
 
 ## Question 1. How do you implement Partial with nested objects?
 
+## Short answer
+
+`Partial<T>` is shallow in TypeScript, so for nested objects you need a recursive mapped type like `DeepPartial<T>` to make all nested properties optional.
+
+---
+
+## Explanation
+
+Built-in `Partial<T>` only applies one level deep:
+
+```ts
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+};
+```
+
+So if you have nested objects, only the top-level keys become optional, while inner objects remain fully required.
+
+To support nested structures, you create a recursive type using conditional types and mapped types:
+
+- If the property is an object → recursively apply `DeepPartial`
+- If it’s a primitive/function/array → leave it as-is (or optionally handle arrays separately)
+
+### Design implications
+
+- Useful for update APIs (PATCH requests)
+- Must carefully handle arrays (they can be treated as atomic or recursively mapped depending on use case)
+- Can introduce complexity in type inference and performance for very large object graphs
+
+---
+
+## Example
+
+```ts
+type Primitive =
+  | string
+  | number
+  | boolean
+  | bigint
+  | symbol
+  | null
+  | undefined
+  | Function
+  | Date;
+
+/**
+ * DeepPartial makes all nested properties optional
+ */
+export type DeepPartial<T> = T extends Primitive
+  ? T
+  : T extends Array<infer U>
+    ? Array<DeepPartial<U>>
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
+
+// Example usage
+interface User {
+  id: string;
+  profile: {
+    name: string;
+    address: {
+      city: string;
+      zip: string;
+    };
+  };
+}
+
+const update: DeepPartial<User> = {
+  profile: {
+    address: {
+      city: "Delhi",
+    },
+  },
+};
+```
+
+---
+
+## Pitfalls
+
+- **Arrays ambiguity**: Should `string[]` become `DeepPartial<string>[]` or `DeepPartial<string[]>`? Behavior depends on design choice.
+- **Functions & classes**: Recursive mapping can unintentionally break callable types or prototypes if not excluded.
+- **Performance in tooling**: Deep recursive types can slow down TypeScript compiler on large models.
+- **Excessive permissiveness**: Can hide invalid partial structures if overused in strict domain models.
+
 ## Question 2. How do you implement Required with nested objects?
 
 ## Question 3. How do you create mapped types with optional modifiers?
