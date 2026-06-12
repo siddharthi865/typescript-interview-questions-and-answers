@@ -25,6 +25,82 @@
 
 ## Question 1. What is the difference between TypeScript and Flow?
 
+## Short answer
+
+TypeScript and Flow are both static type systems for JavaScript, but TypeScript is a superset language with its own compiler and ecosystem dominance, while Flow is a type checker primarily designed as an annotation layer on existing JavaScript codebases.
+
+---
+
+## Explanation
+
+TypeScript and Flow were created to solve the same core problem: adding static typing to JavaScript to improve tooling, maintainability, and scalability. However, they differ significantly in design philosophy, adoption, and long-term ecosystem direction.
+
+**TypeScript (TS)**:
+
+- Developed and maintained by Microsoft.
+- A _superset of JavaScript_ — valid JS is valid TS.
+- Requires compilation via `tsc` to emit JavaScript.
+- Has its own language features (enums, decorators, advanced type system, etc.).
+- Deep integration with modern tooling (VS Code, bundlers, frameworks).
+- Large ecosystem adoption (Angular, NestJS, Next.js, etc.).
+
+**Flow**:
+
+- Developed by Meta (Facebook).
+- A _type checker_ for JavaScript rather than a new language.
+- Relies heavily on type annotations and inference, but does not fundamentally extend JS syntax as much as TS.
+- Works via Babel or a separate Flow checker.
+- Less compiler-centric; integrates as a static analysis step.
+- Adoption has significantly declined in favor of TypeScript in most new projects.
+
+### Key conceptual difference
+
+- TypeScript = **language + compiler + type system**
+- Flow = **static type checker layered onto JavaScript**
+
+This leads to a major practical divergence:
+
+- TypeScript shapes how you write JavaScript code.
+- Flow tries to minimally intrude into existing JavaScript workflows.
+
+---
+
+## Example
+
+A simple function typed in both systems:
+
+### TypeScript
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+const result: number = add(2, 3);
+```
+
+### Flow
+
+```js
+// @flow
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+const result: number = add(2, 3);
+```
+
+Key observation: syntax looks similar, but Flow requires opt-in via `// @flow`, and TypeScript is typically the default in `.ts` files with a compiler pipeline.
+
+---
+
+## Pitfalls
+
+- Flow has **declining ecosystem support**, making integration with modern frameworks harder.
+- TypeScript can become **complex and over-engineered** with advanced type gymnastics.
+- Migration from Flow → TypeScript can be non-trivial in large codebases.
+- Flow depends more on build tooling (Babel) while TypeScript introduces a separate compilation step (`tsc`).
+
 ## Question 2. How does TypeScript improve developer productivity?
 
 ## Question 3. How do you check the TypeScript version installed?
