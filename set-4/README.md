@@ -25,6 +25,88 @@
 
 ## Question 1. How do you create a tuple type with varying lengths?
 
+## Short answer
+
+You create tuple types with varying lengths using **variadic tuple types** (rest elements in tuple positions), e.g. `[T, ...T[]]` or more advanced spread inference with generics like `[...Head, ...Tail]`.
+
+---
+
+## Explanation
+
+In TypeScript, tuples are normally fixed-length arrays with known element types per position. To allow _variable-length tuples_, TypeScript (starting in **TS 4.0**) introduced **variadic tuple types**, which let you use rest elements inside tuple definitions.
+
+There are two common patterns:
+
+### 1. Simple variable-length tuple (same element type repeated)
+
+This is useful when you want at least one element, or a flexible-length list with a fixed first element.
+
+```ts
+type NonEmptyArray<T> = [T, ...T[]];
+```
+
+- First element is required
+- Remaining elements (if any) must match the same type
+
+### 2. Fully generic variadic tuples (preserving structure)
+
+Used when you want to _capture and extend tuple shapes_ generically.
+
+```ts
+type Prepend<T extends any[], U> = [U, ...T];
+
+type Example = Prepend<[number, boolean], string>;
+// Result: [string, number, boolean]
+```
+
+### 3. Flexible tuple concatenation
+
+You can also compose tuples dynamically:
+
+```ts
+type Concat<A extends any[], B extends any[]> = [...A, ...B];
+
+type Result = Concat<[1, 2], [3, 4]>;
+// [1, 2, 3, 4]
+```
+
+This is powerful for modeling function argument lists, pipelines, or builder patterns.
+
+---
+
+## Example
+
+```ts
+// Non-empty tuple of strings
+type NonEmptyStringTuple = [string, ...string[]];
+
+const a: NonEmptyStringTuple = ["hello"];
+const b: NonEmptyStringTuple = ["hello", "world", "typescript"];
+
+// Generic tuple manipulation
+type Append<T extends any[], U> = [...T, U];
+
+type T1 = Append<[number, number], string>;
+// [number, number, string]
+
+function logAll<T extends any[]>(...args: T) {
+  return args;
+}
+
+const result = logAll(1, "a", true);
+// inferred as [number, string, boolean]
+```
+
+---
+
+## Pitfalls
+
+- Variadic tuples require **TypeScript 4.0+**.
+- Overusing them can make inference complex and slow in large codebases.
+- Deeply nested tuple transformations may cause **type instantiation depth errors**.
+- Readability suffers when tuples replace structured objects in domain models.
+- Inference may degrade when spreading large or recursive tuple types.
+
 ## Question 2. What are literal inference rules in TypeScript?
 
 ## Question 3. How do you define a readonly array or tuple?
