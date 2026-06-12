@@ -25,6 +25,78 @@
 
 ## Question 1. How do you type `useState` with an initial null value?
 
+## Short answer
+
+You explicitly provide a union type to include `null`, e.g. `useState<User | null>(null)`, so TypeScript knows the state can start as `null` and later become a value.
+
+---
+
+## Explanation
+
+In React with TypeScript, `useState` infers the type from the initial value. If you pass `null`, TypeScript infers the state type as `null` only, which breaks when you later set a real value.
+
+To handle real-world cases (like async data fetching), you typically model state as a union type:
+
+- `T | null` → “not loaded yet”
+- `T | undefined` → optional state (less explicit)
+- sometimes `T | null | Error` → loading/error modeling
+
+This is important for:
+
+- Safe rendering (`state?.property`)
+- Avoiding runtime crashes
+- Clear domain modeling of “absence vs value”
+
+A key design decision is whether `null` represents:
+
+- “not loaded yet”
+- “no result”
+- or “cleared state”
+
+Most senior-level code prefers making that semantic explicit via union types rather than relying on truthy/falsy checks.
+
+---
+
+## Example
+
+```typescript
+import { useState } from "react";
+
+type User = {
+  id: string;
+  name: string;
+};
+
+export function UserProfile() {
+  const [user, setUser] = useState<User | null>(null);
+
+  const loadUser = () => {
+    setUser({ id: "1", name: "Ada Lovelace" });
+  };
+
+  return (
+    <div>
+      {user ? (
+        <p>{user.name}</p>
+      ) : (
+        <p>No user loaded</p>
+      )}
+
+      <button onClick={loadUser}>Load User</button>
+    </div>
+  );
+}
+```
+
+---
+
+## Pitfalls
+
+- **Type inference trap**: `useState(null)` infers only `null`, not `T | null`.
+- **Overusing `any` fallback**: leads to unsafe state transitions and runtime errors.
+- **Unsafe property access**: forgetting to guard (`user.name` without null check).
+- **Overloading null semantics**: using `null` for both “loading” and “no data” reduces clarity.
+
 ## Question 2. How do you type `useRef` for both DOM elements and custom objects?
 
 ## Question 3. How do you type `useEffect` with dependencies generically?
