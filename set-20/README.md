@@ -25,6 +25,100 @@
 
 ## Question 1. How do you implement polymorphic components in React?
 
+## Short answer
+
+Polymorphic components in React are implemented by allowing the component to change its rendered element via an `as` prop while preserving correct TypeScript typings using generic type parameters and utility types.
+
+---
+
+## Explanation
+
+A polymorphic component is a design pattern where a single component can render different underlying HTML elements (e.g., `button`, `a`, `div`) depending on an `as` prop, while still preserving full type safety for props.
+
+In TypeScript, the challenge is ensuring:
+
+- Props of the underlying element are correctly inferred
+- Custom props are merged safely
+- The `ref` type matches the rendered element
+- IntelliSense works correctly for consumers
+
+### Core idea
+
+We define a generic type parameter `C extends React.ElementType`, which represents the component or HTML tag being rendered.
+
+We then:
+
+1. Extract props of that element using `React.ComponentPropsWithoutRef<C>`
+2. Merge with our custom props
+3. Use `as` to switch rendered element
+4. Preserve type inference using generics
+
+This pattern is widely used in design systems (e.g., Chakra UI, MUI, Radix primitives).
+
+Trade-off:
+
+- Powerful flexibility
+- Increased TypeScript complexity
+- Slight runtime overhead is negligible (just prop forwarding)
+
+---
+
+## Example
+
+```tsx
+import React from "react";
+
+type PolymorphicProps<C extends React.ElementType, Props = {}> = Props & {
+  as?: C;
+} & Omit<React.ComponentPropsWithoutRef<C>, keyof Props | "as">;
+
+type ButtonOwnProps = {
+  variant?: "primary" | "secondary";
+};
+
+type ButtonProps<C extends React.ElementType> = PolymorphicProps<
+  C,
+  ButtonOwnProps
+>;
+
+const Button = <C extends React.ElementType = "button">(
+  props: ButtonProps<C>,
+) => {
+  const { as, variant, ...rest } = props;
+
+  const Component = as || "button";
+
+  return <Component {...rest} data-variant={variant} />;
+};
+
+// Usage examples:
+
+const App = () => {
+  return (
+    <>
+      <Button variant="primary">Default button</Button>
+
+      <Button as="a" href="https://example.com">
+        Link button
+      </Button>
+
+      <Button as="button" disabled>
+        Native button
+      </Button>
+    </>
+  );
+};
+```
+
+---
+
+## Pitfalls
+
+- **Incorrect prop merging**: forgetting to omit overlapping keys can cause type conflicts or unsafe overrides.
+- **Ref typing issues**: not forwarding refs correctly leads to loss of type safety for DOM access.
+- **Overusing polymorphism**: too many `as` variations can make APIs harder to reason about in large design systems.
+- **Runtime assumptions**: assuming all elements support same props (e.g., `href` on `div`) can lead to invalid DOM props if not properly constrained.
+
 ## Question 2. How do you type props with conditional types?
 
 ## Question 3. How do you implement type-safe plugin architectures?
