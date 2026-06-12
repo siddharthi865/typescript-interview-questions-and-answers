@@ -25,6 +25,77 @@
 
 ## Question 1. How do you implement nominal typing in TypeScript?
 
+## Short answer
+
+TypeScript is structurally typed, but you can simulate nominal typing using **branded (opaque) types** with unique symbols or tagged properties to prevent accidental type compatibility.
+
+---
+
+## Explanation
+
+TypeScript normally uses **structural typing**, meaning two types are compatible if their shapes match. This is flexible but can be unsafe for domain modeling (e.g., mixing `UserId` and `OrderId` if both are just `string`).
+
+To enforce **nominal typing**, we “brand” a type with a unique identifier that makes it incompatible with other structurally identical types.
+
+There are two common approaches:
+
+### 1. Branded types (most common, lightweight)
+
+We intersect a base type with a unique marker property:
+
+```ts
+declare const brand: unique symbol;
+
+type Brand<T, TBrand> = T & { readonly [brand]: TBrand };
+
+type UserId = Brand<string, "UserId">;
+type OrderId = Brand<string, "OrderId">;
+```
+
+Now even though both are strings, they are not assignable to each other.
+
+### 2. Opaque types via helper functions (safer at runtime boundaries)
+
+We prevent accidental creation of branded values by requiring constructors:
+
+---
+
+## Example
+
+```ts
+declare const brand: unique symbol;
+
+type Brand<T, TBrand> = T & { readonly [brand]: TBrand };
+
+type UserId = Brand<string, "UserId">;
+type OrderId = Brand<string, "OrderId">;
+
+// helper constructors
+const UserId = (id: string): UserId => id as UserId;
+const OrderId = (id: string): OrderId => id as OrderId;
+
+function getUser(id: UserId) {
+  return `User: ${id}`;
+}
+
+const u = UserId("123");
+const o = OrderId("123");
+
+getUser(u); // OK
+// getUser(o); ❌ Error: OrderId not assignable to UserId
+// getUser("123"); ❌ Error
+```
+
+---
+
+## Pitfalls
+
+- **Type safety is compile-time only**: runtime values are still plain strings.
+- **Casting (`as`) can bypass safety**, so constructors should be controlled.
+- **Overuse can reduce ergonomics**, especially in large public APIs.
+- **Serialization/deserialization loses branding**, requiring re-validation when parsing external data.
+- Debugging can be harder because branded types don’t appear differently at runtime.
+
 ## Question 2. How do you extend existing module types with declaration merging?
 
 ## Question 3. How do you implement type-safe event emitters in Node.js?
