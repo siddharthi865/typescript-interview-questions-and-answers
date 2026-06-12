@@ -24,6 +24,72 @@
 
 ## Question 1. How do you type a function with multiple overloads?
 
+## Short answer
+
+You define multiple function signatures (overloads) above a single implementation signature, which must be compatible with all overloads.
+
+---
+
+## Explanation
+
+Function overloading in TypeScript allows a single function to behave differently based on input types, while still maintaining type safety. You declare several _call signatures_ (the overloads), followed by one concrete implementation that handles all cases.
+
+Key design points:
+
+- Overloads describe the _public API contract_.
+- The implementation signature is not exposed to callers.
+- TypeScript resolves the correct overload at compile time, not runtime.
+- You must ensure the implementation is broad enough to handle all overload cases safely.
+
+This is commonly used for:
+
+- APIs that accept different input shapes (e.g., string vs object config)
+- Libraries with ergonomic interfaces (e.g., `fetch`, `query`, `parse`)
+- Backward-compatible APIs evolving over time
+
+---
+
+## Example
+
+```ts
+// Overload signatures (public API)
+function format(value: string): string;
+function format(value: number, decimals: number): string;
+
+// Implementation signature (must cover all cases)
+function format(value: string | number, decimals?: number): string {
+  if (typeof value === "string") {
+    return value.trim().toUpperCase();
+  }
+
+  // value is number here
+  return value.toFixed(decimals ?? 2);
+}
+
+// Usage
+const a = format(" hello "); // string overload
+const b = format(12.3456, 1); // number overload
+```
+
+---
+
+## Pitfalls
+
+- **Implementation must be compatible with all overloads**
+  - You cannot rely on overload-specific narrowing in the signature layer.
+
+- **Overloads are order-sensitive for readability, not execution**
+  - TypeScript matches from top to bottom in type checking.
+
+- **Too many overloads reduce maintainability**
+  - Often a discriminated union or options object is cleaner.
+
+- **Runtime checks are still required**
+  - Overloads only exist at compile time, not runtime.
+
+- **Cannot overload only by return type**
+  - Differences must be in parameters, not just return type.
+
 ## Question 2. How do you type a function that returns different results based on input?
 
 ## Question 3. How do you implement Partial, Required, and Readonly for nested objects?
