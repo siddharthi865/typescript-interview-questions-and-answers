@@ -25,121 +25,103 @@
 
 ## Question 1. What is TypeScript and how is it different from JavaScript?
 
-TypeScript is a statically typed, superset of JavaScript developed by Microsoft.
+## Short answer
 
-It adds optional static typing, interfaces, enums, generics, and advanced tooling on top of JavaScript, while still compiling down to plain JavaScript
-that runs in any browser or Node.js environment.
+TypeScript is a statically typed superset of JavaScript that adds optional type checking and advanced language features, which are compiled (transpiled) into plain JavaScript before execution.
 
-_TypeScript helps us catch errors at compile time that would otherwise appear at runtime in JavaScript._
+---
 
-### How TypeScript Works Internally
+## Explanation
 
-TypeScript code is not executed directly by the browser or Node.js.
+TypeScript (TS) extends JavaScript (JS) by introducing a **type system and compile-time checks**, while still ultimately producing standard JavaScript that runs anywhere JS runs (browser, Node.js, etc.).
 
-Instead, it goes through a compile step:
+### Key differences:
 
-```bash
-TypeScript (.ts) → TypeScript Compiler (tsc) → JavaScript (.js)
+#### 1. Type system
+
+- **JavaScript:** Dynamically typed (types resolved at runtime)
+- **TypeScript:** Statically typed (types checked at compile time)
+
+This means TS catches many errors before code runs.
+
+#### 2. Compilation step
+
+- JS runs directly in runtime environments
+- TS must be compiled (transpiled) to JS using `tsc`
+
+#### 3. Tooling and IDE support
+
+TypeScript provides:
+
+- Better autocomplete
+- Safer refactoring
+- Inline type errors
+- Enhanced navigation
+
+#### 4. Language features
+
+TypeScript adds:
+
+- Interfaces
+- Generics
+- Enums
+- Tuples
+- Advanced type inference
+- Utility types (`Partial`, `Pick`, etc.)
+
+#### 5. Compatibility
+
+- TypeScript is fully compatible with JavaScript
+- Any valid JS file is valid TS (gradual adoption)
+
+---
+
+### Design implications (senior-level view)
+
+TypeScript is not just “JavaScript with types” — it’s a **compile-time safety layer over a dynamic runtime system**.
+
+This creates trade-offs:
+
+- **Safety vs flexibility:** stricter contracts reduce runtime bugs but add design overhead
+- **Build complexity:** introduces compilation step and tooling pipeline
+- **Type system expressiveness:** enables domain modeling but can become complex if overused
+- **Runtime mismatch risk:** types exist only at compile time, not at runtime
+
+---
+
+## Example
+
+### JavaScript (dynamic typing)
+
+```js
+function add(a, b) {
+  return a + b;
+}
+
+add(1, 2); // 3
+add(1, "2"); // "12" (bug-prone behavior)
 ```
 
-So at runtime, there is no TypeScript, only JavaScript.
+### TypeScript (static typing)
 
-### Key Differences Between TypeScript and JavaScript
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
 
-1. **Typing System (Static vs Dynamic)**
+add(1, 2); // OK
+// add(1, "2"); // Error: Argument of type 'string' is not assignable to parameter of type 'number'
+```
 
-   JavaScript is dynamically typed, while Typescript is statically typed.
+---
 
-   TypeScript catches type-related bugs before execution.
+## Pitfalls
 
-   ```js
-   // Javascript
-
-   let value = 10;
-   value = "hello"; // allowed, no error
-   ```
-
-   ```ts
-   //Typescript
-
-   let value: number = 10;
-   value = "hello"; // Compile-time error
-   ```
-
-2. **Compile-Time Error Checking**
-
-   JavaScript errors are mostly discovered at runtime, while typescript prevents this.
-
-   ```js
-   // Javascript
-
-   function add(a, b) {
-     return a + b;
-   }
-
-   add("2", 3); // "23" — logical bug, no error
-   ```
-
-   ```ts
-   //Typescript
-
-   function add(a: number, b: number): number {
-     return a + b;
-   }
-
-   add("2", 3); // ❌ Type error during compilation
-   ```
-
-3. **Advanced Type Features (Not in JavaScript)**
-
-   TypeScript provides features that don’t exist in JavaScript:
-
-   ```ts
-   interface User {
-     id: number;
-     name: string;
-   }
-
-   function getUser(user: User) {
-     return user.name;
-   }
-   ```
-
-   Other examples:
-   - Interfaces
-   - Enums
-   - Generics
-   - Union & Intersection types
-   - Utility types (`Partial`, `Pick`, `Omit` etc.)
-
-   These features improve **code clarity and maintainability**.
-
-4. **Better Tooling & Developer Experience**
-
-   TypeScript enables:
-   - Auto-completion (IntelliSense)
-   - Safe refactoring
-   - Better navigation
-   - Early error highlighting
-
-   In JavaScript, tooling is more limited and often relies on runtime assumptions.
-
-5. **Scalability & Maintainability**
-
-   JavaScript is great for small scripts and quick prototyping.
-
-   TypeScript is better for large-scale applications where:
-   - Multiple developers work together
-   - Codebase grows over time
-   - Strict contracts are required
-
-   This is why most enterprise frameworks (Angular, NestJS) are built with TypeScript.
-
-6. **Backward Compatibility**
-
-   TypeScript is a superset of JavaScript, so every valid JavaScript code is also valid TypeScript.
-
-_**JavaScript gives flexibility, but TypeScript adds safety and scalability. TypeScript helpscatch bugs early, improves maintainability, and makes large codebases easier tomanage without changing JavaScript’s runtime behavior.**_
+- **False sense of safety:** TypeScript does not validate runtime data (e.g., API responses still need validation)
+- **Overengineering types:** complex type gymnastics can reduce maintainability
+- **Any leakage:** overuse of `any` defeats the purpose of TypeScript
+- **Build-time only checks:** issues can still occur at runtime if not validated properly
+- **Mismatch with backend/runtime data:** especially with JSON APIs
 
 ## Question 2. What are the advantages of using TypeScript?
 
