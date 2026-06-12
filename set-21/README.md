@@ -25,6 +25,104 @@
 
 ## Question 1. What is the difference between module and namespace in TypeScript?
 
+## Short answer
+
+Modules are file-based, ES-compliant scopes used for code organization and dependency management, while namespaces are TypeScript-specific, global-scope constructs mainly used for grouping code in non-module (legacy or ambient) scenarios.
+
+---
+
+## Explanation
+
+### 1. Core concept difference
+
+**Modules (preferred modern approach)**
+
+- File-based scope (each file is a module if it uses `import`/`export`)
+- Align with ES Modules (`import` / `export`)
+- Support tree-shaking, bundlers, and modern tooling
+- Explicit dependencies between files
+- Encourage modular architecture and encapsulation
+
+**Namespaces (formerly “internal modules”)**
+
+- Single global scope container
+- Used to group related code under one global identifier
+- No file-based isolation unless explicitly compiled together
+- Primarily legacy or used in non-module environments (e.g., scripts, global libraries, or DefinitelyTyped-style typings)
+
+---
+
+### 2. Design philosophy
+
+- **Modules = modern software architecture unit** (composition of files, explicit boundaries, dependency graph)
+- **Namespaces = logical grouping tool inside global scope** (historically before ES modules were standard)
+
+TypeScript itself strongly recommends using modules over namespaces for application code.
+
+---
+
+### 3. Dependency and scope behavior
+
+| Feature         | Modules                          | Namespaces            |
+| --------------- | -------------------------------- | --------------------- |
+| Scope           | File-level                       | Global (or merged)    |
+| Imports/exports | Required                         | Not required          |
+| Tooling support | First-class (bundlers, ESM, CJS) | Limited               |
+| Tree-shaking    | Yes                              | No                    |
+| Use case        | App architecture                 | Legacy/global scripts |
+
+---
+
+## Example
+
+### Module (modern approach)
+
+```ts
+// math.ts
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+// app.ts
+import { add } from "./math";
+
+console.log(add(2, 3));
+```
+
+---
+
+### Namespace (legacy/global grouping)
+
+```ts
+namespace MathUtils {
+  export function add(a: number, b: number): number {
+    return a + b;
+  }
+
+  export function multiply(a: number, b: number): number {
+    return a * b;
+  }
+}
+
+console.log(MathUtils.add(2, 3));
+```
+
+To use namespaces properly across files, you'd typically need concatenation or `--outFile`:
+
+```bash
+tsc --outFile bundle.js
+```
+
+---
+
+## Pitfalls
+
+- Namespaces can accidentally pollute or depend on global scope, leading to tight coupling
+- Harder to scale in large codebases due to lack of explicit dependency graph
+- Not tree-shakable, increasing bundle size
+- Mixing modules and namespaces can lead to confusing compilation behavior
+- Modern frameworks (React, Node ESM, Vite, etc.) expect modules, not namespaces
+
 ## Question 2. How do you configure TypeScript for strict mode?
 
 ## Question 3. How do you enable `strictFunctionTypes` in TypeScript and why?
