@@ -25,6 +25,79 @@
 
 ## Question 1. How do you use `typeof` for type checking variables?
 
+## Short answer
+
+`typeof` in TypeScript lets you derive a type from a variable or value at compile time, ensuring type-safe reuse of existing runtime shapes.
+
+---
+
+## Explanation
+
+In TypeScript, `typeof` is used in **type context (not runtime)** to capture the type of a variable, constant, or expression. This is different from JavaScript’s runtime `typeof` operator.
+
+It is especially useful when:
+
+- You want to reuse the type of an existing variable without duplicating it.
+- You’re working with inferred complex types (objects, functions).
+- You want to ensure consistency between a value and its type definition.
+
+Key idea:
+
+- `typeof` in **JavaScript** → returns a string at runtime (`"string"`, `"number"`, etc.)
+- `typeof` in **TypeScript (type space)** → extracts the static type of a value
+
+This helps avoid drift between data and type definitions and is commonly used in design systems, config objects, and API response typing.
+
+---
+
+## Example
+
+```ts
+const user = {
+  id: 1,
+  name: "Alice",
+  isAdmin: false,
+};
+
+// Derive a type from the variable
+type User = typeof user;
+
+function printUser(u: User) {
+  console.log(u.name.toUpperCase());
+}
+
+const newUser: User = {
+  id: 2,
+  name: "Bob",
+  isAdmin: true,
+};
+```
+
+You can also use it with functions:
+
+```ts
+function createUser(name: string) {
+  return {
+    id: Math.random(),
+    name,
+  };
+}
+
+// Extract return type
+type CreateUserReturn = ReturnType<typeof createUser>;
+
+const u: CreateUserReturn = createUser("Alice");
+```
+
+---
+
+## Pitfalls
+
+- Confusing runtime `typeof` with type-level `typeof` (very common interview trap).
+- Overusing `typeof` can couple types tightly to implementation details.
+- Changes in the source object automatically propagate, which may break consumers unexpectedly.
+- Doesn’t work the same way with classes vs instances vs constructors without understanding context (`typeof Class` vs instance type).
+
 ## Question 2. How do you differentiate between `any` and `unknown`?
 
 ## Question 3. How do you use `never` to signal unreachable code?
