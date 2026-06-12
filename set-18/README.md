@@ -25,6 +25,90 @@
 
 ## Question 1. How do you define conditional types?
 
+## Short answer
+
+Conditional types in TypeScript let you express types that depend on a condition using the syntax `T extends U ? X : Y`, enabling type-level branching and inference.
+
+---
+
+## Explanation
+
+Conditional types are one of TypeScript’s most powerful type-level constructs. They allow you to define a type that evaluates differently based on whether a type `T` is assignable to another type `U`.
+
+At a high level:
+
+```ts
+T extends U ? X : Y
+```
+
+- If `T` is assignable to `U`, the result is `X`
+- Otherwise, the result is `Y`
+
+### Key capabilities:
+
+1. **Type narrowing at compile time**
+   - Acts like `if/else` but for types.
+
+2. **Distributive behavior over unions**
+   - If `T` is a union, the conditional type is applied to each member.
+
+3. **Type inference with `infer`**
+   - You can extract parts of types (e.g., return types, array element types).
+
+### Design implications:
+
+- Enables building utility types like `ReturnType`, `Parameters`, `Exclude`, `Extract`.
+- Encourages declarative, composable type systems instead of manual unions.
+- Can become complex and impact type-checker performance if overused deeply.
+
+---
+
+## Example
+
+```ts
+type IsString<T> = T extends string ? true : false;
+
+type A = IsString<string>; // true
+type B = IsString<number>; // false
+
+// Distributive behavior over unions
+type C = IsString<string | number>;
+// equivalent to IsString<string> | IsString<number>
+// result: true | false
+```
+
+### With `infer` (advanced real-world pattern)
+
+```ts
+type ReturnTypeOf<T> = T extends (...args: any[]) => infer R ? R : never;
+
+function getUser() {
+  return { id: 1, name: "Alice" };
+}
+
+type User = ReturnTypeOf<typeof getUser>;
+// { id: number; name: string }
+```
+
+---
+
+## Pitfalls
+
+- **Unintended distributive behavior**
+  - Conditional types distribute over unions unless wrapped in a tuple: `[T] extends [U]`
+
+- **Readability issues**
+  - Deeply nested conditional types become hard to maintain and debug
+
+- **Performance overhead**
+  - Complex recursive conditional types can slow down type checking in large codebases
+
+- **Overuse instead of simpler utilities**
+  - Sometimes a mapped type or union is clearer
+
+- **Inference surprises with `infer`**
+  - Can produce `never` silently if pattern doesn’t match
+
 ## Question 2. How do you implement `Partial<T>` for nested objects?
 
 ## Question 3. How do you implement `Required<T>` for nested objects?
